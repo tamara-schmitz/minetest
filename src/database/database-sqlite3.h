@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include "database.h"
 #include "exceptions.h"
+#include "log.h"
 
 extern "C" {
 #include "sqlite3.h"
@@ -128,6 +129,7 @@ private:
 	void openDatabase();
 
 	bool m_initialized = false;
+	static inline bool sqlite_initialized;
 
 	std::string m_savedir = "";
 	std::string m_dbname = "";
@@ -138,6 +140,10 @@ private:
 	s64 m_busy_handler_data[2];
 
 	static int busyHandler(void *data, int count);
+
+	static inline void errorLogCallback(void *pArg, int iErrCode, const char *zMsg){
+		errorstream << "SQLite3 Error: " << iErrCode << " " << zMsg << std::endl;
+	}
 };
 
 class MapDatabaseSQLite3 : private Database_SQLite3, public MapDatabase

@@ -117,6 +117,16 @@ Database_SQLite3::Database_SQLite3(const std::string &savedir, const std::string
 	m_savedir(savedir),
 	m_dbname(dbname)
 {
+	// do sqlite configuration that needs to happen prior to opening any DB
+	if (!Database_SQLite3::sqlite_initialized) {
+		if (sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, NULL) != SQLITE_OK) {
+			warningstream << "SQLite3 failed to setup error logging." << std::endl;
+		}
+		if (sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0) != SQLITE_OK) {
+			infostream << "SQLite3 failed to disable memory usage statistics collection." << std::endl;
+		}
+		Database_SQLite3::sqlite_initialized = true;
+	}
 }
 
 void Database_SQLite3::beginSave()
